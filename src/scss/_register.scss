@@ -1,0 +1,25 @@
+.register-form {
+  border: 2px solid #b4acac;
+  padding: 2rem;
+  margin-top: 4rem;
+  border-radius: 0.25rem;
+  box-shadow: 5px 5px 15px -3px #000000;
+
+  .register-form-title {
+    font-size: 35px;
+    font-style: italic;
+    font-family: "Lobster Two", cursive;
+    font-weight: bold;
+    color: #0a978e;
+  }
+
+  .register-form-btn {
+    border-radius: 12px;
+    width: 100%;
+    background: #278a87;
+    border: none;
+    color: white;
+    font-weight: bolder;
+    font-size: 1rem;
+  }
+}
