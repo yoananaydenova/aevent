@@ -40,7 +40,7 @@
 
     .event-card-buttons {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
 
       .event-card-button {
         border-radius: 18px;
@@ -49,18 +49,7 @@
         color: white;
         font-weight: bolder;
         font-size: 1.5rem;
-
-        &.favorite {
-          background: none;
-          color: red;
-          border: none;
-          padding: 0;
-
-          svg{
-            font-size: 2.5rem;;
-          }
-          
-        }
+        width: 50%;
       }
     }
   }

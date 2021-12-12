@@ -7,28 +7,38 @@
   align-items: center;
 
   .catalog-header {
-    height: 8rem;
     width: 100%;
     padding: 1.5rem 0;
     text-align: center;
 
-    .catalog-header-buttons{
-        margin: 1.5rem;
-        display: flex;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
+    .catalog-title {
+      font-family: "Lobster Two", cursive;
+      font-size: 4rem;
+      color: #278a87;
+    }
+
+    .catalog-header-buttons {
+      margin: 1.5rem;
+      display: flex;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+
+      button {
+        font-size: larger;
+        font-weight: bold;
+      }
     }
   }
 
-  .catalog-content{
+  .catalog-content {
     display: flex;
     min-height: 70vh;
     flex-wrap: wrap;
     justify-content: space-around;
     align-content: space-around;
 
-    .catalog-content-text{
-        text-align: center;
+    .catalog-content-text {
+      text-align: center;
     }
   }
 }

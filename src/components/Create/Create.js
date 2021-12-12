@@ -1,13 +1,20 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { useAuthContext } from "../../contexts/AuthContext";
+import useForm from "../../hooks/useForm";
+
 import * as categoryService from "../../services/categoryService";
 import * as eventService from "../../services/eventService";
 import * as cloudinaryService from "../../services/cloudinaryService";
 
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Alert from "react-bootstrap/Alert";
+
 const Create = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuthContext();
   const [categories, setCategories] = useState([]);
   let history = useHistory();
 
@@ -19,7 +26,6 @@ const Create = () => {
   }, []);
 
   const onEventCreate = async (e) => {
-    e.preventDefault();
     let target = e.target;
     let formData = {};
 
@@ -29,11 +35,13 @@ const Create = () => {
           target.elements[i].id === "eventImage" ||
           target.elements[i].id === "backgroundImage"
         ) {
-          let imageFile = target.elements[i].files[0];
-
-          let result = await cloudinaryService.uploadImage(imageFile);
-
-          formData[target.elements[i].id] = result.secure_url;
+          if (target.elements[i].files[0]) {
+            let imageFile = target.elements[i].files[0];
+            let result = await cloudinaryService.uploadImage(imageFile);
+            formData[target.elements[i].id] = result.secure_url;
+          } else {
+            formData[target.elements[i].id] = "";
+          }
         } else {
           formData[target.elements[i].id] = target.elements[i].value;
         }
@@ -48,20 +56,28 @@ const Create = () => {
       formData.eventOrganizer = user.firstName + " " + user.lastName;
     }
 
-    formData.favorite = 0;
-
     eventService.createEvent(formData, user.accessToken).then((response) => {
       history.push("/");
     });
   };
 
+  const { handleChange,  errors, handleSubmit } =
+    useForm(onEventCreate);
+
   return (
-    <Form className="create-form" onSubmit={onEventCreate} method="POST">
+    <Form className="create-form" onSubmit={handleSubmit} method="POST">
       <Form.Text className="create-form-title">Create Event</Form.Text>
 
       <Form.Group className="mb-3" controlId="title">
         <Form.Label>Title</Form.Label>
-        <Form.Control type="text" placeholder="Enter event title" />
+        <Form.Control
+          type="text"
+          placeholder="Enter event title"
+          required
+          onChange={handleChange}
+        />
+
+        {errors.title ? <Alert variant="danger"> {errors.title}</Alert> : null}
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="category">
@@ -80,12 +96,12 @@ const Create = () => {
 
       <Form.Group className="mb-3" controlId="eventImage">
         <Form.Label>Add event image</Form.Label>
-        <Form.Control type="file" />
+        <Form.Control type="file" accept="image/jpeg,image/png" />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="backgroundImage">
         <Form.Label>Add event image background</Form.Label>
-        <Form.Control type="file" />
+        <Form.Control type="file" accept="image/jpeg,image/png" />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="country">
@@ -108,26 +124,18 @@ const Create = () => {
           <Form.Group
             as={Row}
             className="create-form-dates-group-date-element"
-            controlId="startDate"
+            controlId="startDateTime"
           >
-            <Form.Label column sm={3}>
-              Start date
+            <Form.Label column sm={10}>
+              Start date time
             </Form.Label>
             <Col>
-              <Form.Control type="date" />
-            </Col>
-          </Form.Group>
-
-          <Form.Group
-            as={Row}
-            className="create-form-dates-group-date-element"
-            controlId="startTime"
-          >
-            <Form.Label column sm={3}>
-              Start time
-            </Form.Label>
-            <Col>
-              <Form.Control type="time" />
+              <Form.Control
+                type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)}
+                onChange={handleChange}
+                required
+              />
             </Col>
           </Form.Group>
         </Col>
@@ -136,29 +144,25 @@ const Create = () => {
           <Form.Group
             as={Row}
             className="create-form-dates-group-date-element"
-            controlId="endDate"
+            controlId="endDateTime"
           >
-            <Form.Label column sm={3}>
-              End date
+            <Form.Label column sm={10}>
+              End date time
             </Form.Label>
             <Col>
-              <Form.Control type="date" />
-            </Col>
-          </Form.Group>
-
-          <Form.Group
-            as={Row}
-            className="create-form-dates-group-date-element"
-            controlId="endTime"
-          >
-            <Form.Label column sm={3}>
-              End time
-            </Form.Label>
-            <Col>
-              <Form.Control type="time" />
+              <Form.Control
+                type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)}
+                onChange={handleChange}
+                required
+              />
             </Col>
           </Form.Group>
         </Col>
+
+        {errors.dateTime ? (
+          <Alert variant="danger"> {errors.dateTime}</Alert>
+        ) : null}
       </Row>
 
       <Form.Group className="create-form-detail" controlId="detailInfo">
@@ -167,7 +171,12 @@ const Create = () => {
           as="textarea"
           rows={3}
           placeholder="Enter detail information about the event"
+          onChange={handleChange}
+          required
         />
+        {errors.detailInfo ? (
+          <Alert variant="danger"> {errors.detailInfo}</Alert>
+        ) : null}
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="eventOrganizer">

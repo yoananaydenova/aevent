@@ -19,7 +19,7 @@ export const login = async (email, password) => {
 };
 
 export const register = (data) => {
- return fetch(`${baseUrl}/users/register`, {
+  return fetch(`${baseUrl}/users/register`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -29,13 +29,12 @@ export const register = (data) => {
 };
 
 export const logout = (token) => {
-  return fetch( `{baseUrl}/users/logout`,{
+  return fetch(`{baseUrl}/users/logout`, {
     method: "GET",
     headers: {
-      "X-Authorization":  token ,
-    }
-  })
-
+      "X-Authorization": token,
+    },
+  });
 };
 
 export const isAuthenticated = () => {
@@ -48,4 +47,21 @@ export const getUser = () => {
   return username;
 };
 
+export const changeUserInfo = async (user) => {
+  let response = await fetch(`${baseUrl}/users/${user._id}`, {
+    method: "PUT",
+    headers: {
+      "content-type": "application/json",
+      "X-Authorization": user.accessToken,
+    },
+    body: JSON.stringify(user),
+  });
 
+  let result = await response.json();
+  if (response.ok) {
+    return result;
+  } else {
+    throw result.message;
+  }
+  return result;
+};

@@ -54,26 +54,36 @@
         font-size: 30px;
         width: 100%;
       }
-     
     }
-
-    
   }
 
-  .event-details-body-buttons{
+  .event-details-body-buttons {
     display: flex;
     max-width: 50rem;
     justify-content: space-evenly;
     margin: 2rem 0;
   }
 
-  .event-details-button-favorite {
-    background: transparent;
-    color: red;
-    // position: absolute;
-    top: -67px;
-    right: -27px;
-    border: none;
-    font-size: 60px;
+  .event-details-favorite {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+
+    .event-details-button-favorite {
+      background: transparent;
+      color: red;
+      top: -67px;
+      right: -27px;
+      border: none;
+      display: flex;
+      font-size: 60px;
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .event-details-favorite-text {
+      font-size: 18px;
+    }
   }
 }

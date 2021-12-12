@@ -1,29 +1,29 @@
-import { Card, Button } from "react-bootstrap";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-//import { faHeart } from '@fortawesome/free-solid-svg-icons'
-import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 
 const EventCard = ({ event }) => {
-  const options = {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  };
-
-  const dateFormatterHandler = (dateStr) => {
+  const dateFormatter = (dateStr) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", options);
+    return date
+      .toDateString()
+      .concat(" - ")
+      .concat(
+        date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+      );
   };
 
   return (
     <Card className="event-card">
-      <Card.Img className="event-card-img" variant="top" src={event.eventImage} />
+      <Card.Img
+        className="event-card-img"
+        variant="top"
+        src={event.eventImage ? event.eventImage : "/images/img-event.jpg"}
+      />
 
       <Card.Body>
         <Card.Subtitle className="event-card-date">
-          {dateFormatterHandler(event.startDate)} - {event.startTime}h
+          {dateFormatter(event.startDateTime)}
         </Card.Subtitle>
         <Card.Title className="event-card-title">{event.title}</Card.Title>
         <Card.Text className="event-card-text">{event.detailInfo}</Card.Text>
@@ -35,14 +35,6 @@ const EventCard = ({ event }) => {
             variant="primary"
           >
             Details
-          </Button>
-
-          <Button className="event-card-button favorite" variant="primary">
-            {/* <FontAwesomeIcon icon={faHeart} /> */}
-            <FontAwesomeIcon icon={farHeart} />
-          </Button>
-          <Button className="event-card-button" variant="primary">
-            Join
           </Button>
         </div>
       </Card.Body>
