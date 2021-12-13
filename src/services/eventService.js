@@ -49,8 +49,6 @@ export const editEvent = (eventId, eventData) => {
   return request.put(`${baseUrl}/events/${eventId}`, eventData);
 };
 
-
-
 // todo pagination and sorting
 export const getEventsByCategory = async (categoryId) => {
   let response = await fetch(
@@ -68,7 +66,7 @@ export const getEventsByCategory = async (categoryId) => {
 
 export const getEventsByCategoryAndOwner = async (categoryId, ownerId) => {
   let response = await fetch(
-    `${baseUrl}/events?where=_ownerId%3D%22${ownerId}%22&&where=category%3D%22${categoryId}%22`
+    `${baseUrl}/events?where=_ownerId%3D%22${ownerId}%22 AND category%3D%22${categoryId}%22`
   );
 
   let result = [];
@@ -84,7 +82,7 @@ export const getMostRecentEvents = async (size) => {
   let response = await fetch(
     `${baseUrl}/events?sortBy=startDateTime&pageSize=${size}`
   );
- 
+
   let result = [];
   if (response.ok) {
     let events = await response.json();
@@ -92,4 +90,19 @@ export const getMostRecentEvents = async (size) => {
   }
 
   return result;
+};
+
+export const getAllEventsById = async (resultEventIdAsString) => {
+  return request.get(
+    `${baseUrl}/events?where=_id IN (${resultEventIdAsString})`
+  );
+};
+
+export const getAllEventsByIdAndCategory = async (
+  resultEventIdAsString,
+  categoryId
+) => {
+  return request.get(
+    `${baseUrl}/events?where=category%3D%22${categoryId}%22 AND _id IN (${resultEventIdAsString})`
+  );
 };

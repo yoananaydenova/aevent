@@ -1,4 +1,3 @@
-import { faCapsules } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 // import { omit } from "loadash";
 

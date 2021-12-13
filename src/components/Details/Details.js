@@ -8,6 +8,7 @@ import {
 
 import * as favoritesService from "../../services/favoritesService";
 import * as eventService from "../../services/eventService";
+import * as joinService from "../../services/joinService";
 
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -25,6 +26,13 @@ const initialFavoriteItem = {
   _id: "",
 };
 
+const initialJoinItem = {
+  _ownerId: "",
+  eventId: "",
+  _createdOn: "",
+  _id: "",
+};
+
 const Details = () => {
   const history = useHistory();
   const [event, setEvent] = useState({});
@@ -35,18 +43,26 @@ const Details = () => {
 
   const [favorite, setFavorite] = useState(initialFavoriteItem);
 
+  const [join, setJoin] = useState(initialJoinItem);
+
   useEffect(() => {
     eventService.getOne(eventId).then((result) => {
       setEvent(result);
     });
 
     async function getFavorite() {
-      let response = await favoritesService.getFavoriteById(user._id, eventId);
-      if (!response) {
-        setFavorite(response);
+      let favorite = await favoritesService.getFavoriteById(user._id, eventId);
+      if (favorite.length > 0) {
+        setFavorite(favorite[0]);
       }
     }
     getFavorite();
+
+    joinService.getJoinedEventById(user._id, eventId).then((response) => {
+      if (response.length > 0) {
+        setJoin(response[0]);
+      }
+    });
   }, [eventId, user._id]);
 
   const deleteButtonHandler = (e) => {
@@ -69,7 +85,6 @@ const Details = () => {
 
   const favoriteHandler = (e) => {
     e.preventDefault();
-
     //if have id - delete
     if (favorite._id) {
       favoritesService.deleteFavorite(favorite._id).then((res) => {
@@ -89,6 +104,28 @@ const Details = () => {
             types.success
           );
         });
+    }
+  };
+
+  const joinHandler = (e) => {
+    e.preventDefault();
+    //if have id - delete
+    if (join._id) {
+      joinService.deleteJoinEvent(join._id).then((res) => {
+        setJoin(initialJoinItem);
+        addNotification(
+          "Successfuly delete the event from the joined events",
+          types.success
+        );
+      });
+    } else {
+      joinService.addJoinEvent({ eventId }, user.accessToken).then((res) => {
+        setJoin(res);
+        addNotification(
+          "Successfuly added the event to the joined events",
+          types.success
+        );
+      });
     }
   };
 
@@ -122,13 +159,12 @@ const Details = () => {
       >
         {favorite._id ? (
           <>
-            <FontAwesomeIcon icon={faHeart} />{" "}
+            <FontAwesomeIcon icon={faHeart} />
             <p className="event-details-favorite-text">Remove from favorite</p>
           </>
         ) : (
           <>
-            {" "}
-            <FontAwesomeIcon icon={farHeart} />{" "}
+            <FontAwesomeIcon icon={farHeart} />
             <p className="event-details-favorite-text">Add to favorite</p>
           </>
         )}
@@ -164,10 +200,31 @@ const Details = () => {
             <Card.Title className="event-details-title">
               {event.title}
             </Card.Title>
-
-            <Button className="event-details-button-join" variant="success">
-              Join
-            </Button>
+            <section className="event-details-buttons">
+              {join._id ? (
+                <>
+                  <p>You have joined. Can't attent?</p>
+                  <Button
+                    className="event-details-button-miss"
+                    variant="secondary"
+                    onClick={joinHandler}
+                  >
+                    I will miss the event
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p>You haven't joined yet. We are waiting for you...</p>
+                  <Button
+                    className="event-details-button-join"
+                    variant="success"
+                    onClick={joinHandler}
+                  >
+                    Join
+                  </Button>
+                </>
+              )}
+            </section>
           </section>
         </section>
 
