@@ -4,6 +4,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import useForm from "../../hooks/useForm";
 
 import ImagePreview from "../ImagePreview";
+import { resizeImageFile } from "../Common/ImageResizer";
 
 import * as categoryService from "../../services/categoryService";
 import * as eventService from "../../services/eventService";
@@ -54,7 +55,13 @@ const Edit = () => {
         ) {
           if (target.elements[i].files[0]) {
             let imageFile = target.elements[i].files[0];
-            let result = await cloudinaryService.uploadImage(imageFile);
+
+            const imageResized = await resizeImageFile(
+              imageFile,
+              target.elements[i].id
+            );
+
+            let result = await cloudinaryService.uploadImage(imageResized);
             formData[target.elements[i].id] = result.secure_url;
           } else {
             if (target.elements[i].id === "eventImage" && deleteOldEventImage) {
