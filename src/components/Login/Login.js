@@ -29,10 +29,7 @@ const Login = () => {
       })
       .catch((err) => {
         console.log(err);
-        addNotification(
-          err,
-          types.error
-        );
+        addNotification(err, types.error);
       });
   }
   return (

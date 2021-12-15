@@ -30,7 +30,8 @@ function getToken() {
   try {
     let userItem = localStorage.getItem("user");
     if (!userItem) {
-      throw { message: "You must be authenticated!" };
+      // throw { message: "You must be authenticated!" };
+      throw new Error({ message: "You must be authenticated!" });
     }
 
     let user = JSON.parse(userItem);

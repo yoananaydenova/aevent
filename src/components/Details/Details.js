@@ -1,37 +1,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
-import {
-  useNotificationContext,
-  types,
-} from "../../contexts/NotificationContext";
 
-import * as favoritesService from "../../services/favoritesService";
 import * as eventService from "../../services/eventService";
-import * as joinService from "../../services/joinService";
 
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import ConformDialog from "../Common/ConformDialog";
-
-const initialFavoriteItem = {
-  _ownerId: "",
-  eventId: "",
-  _createdOn: "",
-  _id: "",
-};
-
-const initialJoinItem = {
-  _ownerId: "",
-  eventId: "",
-  _createdOn: "",
-  _id: "",
-};
+import FavoriteEvent from "../FavoriteEvent";
+import JoinEvent from "../JoinEvent";
 
 const Details = () => {
   const history = useHistory();
@@ -39,29 +18,10 @@ const Details = () => {
   const [show, setShow] = useState(false);
   const { eventId } = useParams();
   const { user } = useAuthContext();
-  const { addNotification } = useNotificationContext();
-
-  const [favorite, setFavorite] = useState(initialFavoriteItem);
-
-  const [join, setJoin] = useState(initialJoinItem);
 
   useEffect(() => {
     eventService.getOne(eventId).then((result) => {
       setEvent(result);
-    });
-
-    async function getFavorite() {
-      let favorite = await favoritesService.getFavoriteById(user._id, eventId);
-      if (favorite.length > 0) {
-        setFavorite(favorite[0]);
-      }
-    }
-    getFavorite();
-
-    joinService.getJoinedEventById(user._id, eventId).then((response) => {
-      if (response.length > 0) {
-        setJoin(response[0]);
-      }
     });
   }, [eventId, user._id]);
 
@@ -83,52 +43,6 @@ const Details = () => {
       });
   };
 
-  const favoriteHandler = (e) => {
-    e.preventDefault();
-    //if have id - delete
-    if (favorite._id) {
-      favoritesService.deleteFavorite(favorite._id).then((res) => {
-        setFavorite(initialFavoriteItem);
-        addNotification(
-          "Successfuly delete the event from the favorite collection",
-          types.success
-        );
-      });
-    } else {
-      favoritesService
-        .addFavorite({ eventId }, user.accessToken)
-        .then((res) => {
-          setFavorite(res);
-          addNotification(
-            "Successfuly added the event to the favorite collection",
-            types.success
-          );
-        });
-    }
-  };
-
-  const joinHandler = (e) => {
-    e.preventDefault();
-    //if have id - delete
-    if (join._id) {
-      joinService.deleteJoinEvent(join._id).then((res) => {
-        setJoin(initialJoinItem);
-        addNotification(
-          "Successfuly delete the event from the joined events",
-          types.success
-        );
-      });
-    } else {
-      joinService.addJoinEvent({ eventId }, user.accessToken).then((res) => {
-        setJoin(res);
-        addNotification(
-          "Successfuly added the event to the joined events",
-          types.success
-        );
-      });
-    }
-  };
-
   const dateFormatter = (dateStr) => {
     const date = new Date(dateStr);
     return date
@@ -148,28 +62,6 @@ const Details = () => {
         Delete
       </Button>
     </>
-  );
-
-  const userButtons = (
-    <section className="event-details-favorite">
-      <Button
-        className="event-details-button-favorite"
-        variant="primary"
-        onClick={favoriteHandler}
-      >
-        {favorite._id ? (
-          <>
-            <FontAwesomeIcon icon={faHeart} />
-            <p className="event-details-favorite-text">Remove from favorite</p>
-          </>
-        ) : (
-          <>
-            <FontAwesomeIcon icon={farHeart} />
-            <p className="event-details-favorite-text">Add to favorite</p>
-          </>
-        )}
-      </Button>
-    </section>
   );
 
   return (
@@ -200,38 +92,17 @@ const Details = () => {
             <Card.Title className="event-details-title">
               {event.title}
             </Card.Title>
-            <section className="event-details-buttons">
-              {join._id ? (
-                <>
-                  <p>You have joined. Can't attent?</p>
-                  <Button
-                    className="event-details-button-miss"
-                    variant="secondary"
-                    onClick={joinHandler}
-                  >
-                    I will miss the event
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <p>You haven't joined yet. We are waiting for you...</p>
-                  <Button
-                    className="event-details-button-join"
-                    variant="success"
-                    onClick={joinHandler}
-                  >
-                    Join
-                  </Button>
-                </>
-              )}
-            </section>
+
+            <JoinEvent eventId={eventId} />
           </section>
         </section>
 
         <Card.Body>
           <section className="event-details-body-buttons">
-            {user._id &&
-              (user._id === event._ownerId ? ownerButtons : userButtons)}
+            {user._id && (user._id === event._ownerId ? ownerButtons : null)}
+            {user._id !== event._ownerId ? (
+              <FavoriteEvent eventId={eventId} />
+            ) : null}
           </section>
           <Card.Title>Details about the event</Card.Title>
           <Card.Text className="event-details-text">

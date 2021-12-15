@@ -35,6 +35,10 @@ const Register = () => {
           types.success
         );
         history.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        addNotification(err, types.error);
       });
   }
 

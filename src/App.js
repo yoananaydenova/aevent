@@ -16,6 +16,7 @@ import Catalog from "./components/Catalog";
 import Dashboard from "./components/Dashboard";
 import ErrorBoundary from "./components/Common/ErrorBoundary";
 import Notification from "./components/Common/Notification";
+import { isAuth } from "./hoc/isAuth";
 import "./scss/app.scss";
 
 function App() {
@@ -33,10 +34,10 @@ function App() {
               <Route exact path="/register" component={Register} />
               <Route exact path="/about-us" component={AboutUs} />
               <Route path="/details/:eventId" component={Details} />
-              <Route path="/edit/:eventId" component={Edit} />
-              <Route path="/create" component={Create} />
               <Route path="/catalog" component={Catalog} />
-              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/edit/:eventId" component={isAuth(Edit)} />
+              <Route path="/create" component={isAuth(Create)} />
+              <Route path="/dashboard" component={isAuth(Dashboard)} />
             </Switch>
           </main>
           <footer>

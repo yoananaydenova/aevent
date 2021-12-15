@@ -3,6 +3,8 @@ import { useHistory } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
 import useForm from "../../hooks/useForm";
 
+import ImagePreview from "../ImagePreview";
+
 import * as categoryService from "../../services/categoryService";
 import * as eventService from "../../services/eventService";
 import * as cloudinaryService from "../../services/cloudinaryService";
@@ -55,19 +57,17 @@ const Create = () => {
     if (formData.eventOrganizer === "") {
       formData.eventOrganizer = user.firstName + " " + user.lastName;
     }
-
+    console.log("formData", formData);
     eventService.createEvent(formData, user.accessToken).then((response) => {
       history.push("/");
     });
   };
 
-  const { handleChange,  errors, handleSubmit } =
-    useForm(onEventCreate);
+  const { handleChange, errors, handleSubmit } = useForm(onEventCreate);
 
   return (
     <Form className="create-form" onSubmit={handleSubmit} method="POST">
       <Form.Text className="create-form-title">Create Event</Form.Text>
-
       <Form.Group className="mb-3" controlId="title">
         <Form.Label>Title</Form.Label>
         <Form.Control
@@ -79,7 +79,6 @@ const Create = () => {
 
         {errors.title ? <Alert variant="danger"> {errors.title}</Alert> : null}
       </Form.Group>
-
       <Form.Group className="mb-3" controlId="category">
         <Form.Label>Category</Form.Label>
         <Form.Select>
@@ -94,31 +93,31 @@ const Create = () => {
         </Form.Select>
       </Form.Group>
 
-      <Form.Group className="mb-3" controlId="eventImage">
-        <Form.Label>Add event image</Form.Label>
-        <Form.Control type="file" accept="image/jpeg,image/png" />
-      </Form.Group>
+      <ImagePreview
+        t
+        itle="Add event image"
+        controlId="eventImage"
+        deleteImage={() => {}}
+      />
 
-      <Form.Group className="mb-3" controlId="backgroundImage">
-        <Form.Label>Add event image background</Form.Label>
-        <Form.Control type="file" accept="image/jpeg,image/png" />
-      </Form.Group>
+      <ImagePreview
+        title="Add background image for your event"
+        controlId="backgroundImage"
+        deleteImage={() => {}}
+      />
 
       <Form.Group className="mb-3" controlId="country">
         <Form.Label>Country</Form.Label>
         <Form.Control type="text" placeholder="Enter country" />
       </Form.Group>
-
       <Form.Group className="mb-3" controlId="city">
         <Form.Label>City</Form.Label>
         <Form.Control type="text" placeholder="Enter city" />
       </Form.Group>
-
       <Form.Group className="mb-3" controlId="address">
         <Form.Label>Address</Form.Label>
         <Form.Control type="text" placeholder="Enter event address" />
       </Form.Group>
-
       <Row className="create-form-dates-group">
         <Col className="create-form-dates-group-date">
           <Form.Group
@@ -164,7 +163,6 @@ const Create = () => {
           <Alert variant="danger"> {errors.dateTime}</Alert>
         ) : null}
       </Row>
-
       <Form.Group className="create-form-detail" controlId="detailInfo">
         <Form.Label>Deatail information about the event</Form.Label>
         <Form.Control
@@ -178,7 +176,6 @@ const Create = () => {
           <Alert variant="danger"> {errors.detailInfo}</Alert>
         ) : null}
       </Form.Group>
-
       <Form.Group className="mb-3" controlId="eventOrganizer">
         <Form.Label>Event organizer</Form.Label>
         <Form.Control
@@ -190,7 +187,6 @@ const Create = () => {
           as organizer.
         </Form.Text>
       </Form.Group>
-
       <Button className="create-form-btn" variant="primary" type="submit">
         Submit
       </Button>

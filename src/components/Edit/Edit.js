@@ -3,13 +3,14 @@ import { useHistory, useParams } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
 import useForm from "../../hooks/useForm";
 
+import ImagePreview from "../ImagePreview";
+
 import * as categoryService from "../../services/categoryService";
 import * as eventService from "../../services/eventService";
 import * as cloudinaryService from "../../services/cloudinaryService";
 
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import Image from "react-bootstrap/Image";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
@@ -18,6 +19,8 @@ const Edit = () => {
   const { user } = useAuthContext();
   const [categories, setCategories] = useState([]);
   const [event, setEvent] = useState({});
+  const [deleteOldEventImage, setDeleteOldEventImage] = useState(false);
+  const [deleteOldBgImage, setDeleteOldBgImage] = useState(false);
   const { eventId } = useParams();
 
   let history = useHistory();
@@ -40,7 +43,7 @@ const Edit = () => {
     });
   }, [eventId, setValues]);
 
- async function onEventEditHandler (e){
+  async function onEventEditHandler(e) {
     let target = e.target;
     let formData = {};
     for (let i = 0; i < target.length; i++) {
@@ -54,7 +57,16 @@ const Edit = () => {
             let result = await cloudinaryService.uploadImage(imageFile);
             formData[target.elements[i].id] = result.secure_url;
           } else {
-            formData[target.elements[i].id] = "";
+            if (target.elements[i].id === "eventImage" && deleteOldEventImage) {
+              formData[target.elements[i].id] = "";
+            } else if (
+              target.elements[i].id === "backgroundImage" &&
+              deleteOldBgImage
+            ) {
+              formData[target.elements[i].id] = "";
+            } else {
+              formData[target.elements[i].id] = event.eventImage;
+            }
           }
         } else {
           formData[target.elements[i].id] = target.elements[i].value;
@@ -68,11 +80,10 @@ const Edit = () => {
       formData.eventOrganizer = user.firstName + " " + user.lastName;
     }
 
-    console.log(formData);
     eventService.editEvent(eventId, formData).then((response) => {
       history.push("/");
     });
-  };
+  }
 
   return (
     <>
@@ -110,30 +121,19 @@ const Edit = () => {
           </Form.Select>
         </Form.Group>
 
-        <Image
-          rounded
-          className="edit-image"
-          src={event.eventImage ? event.eventImage : "/images/img-event.jpg"}
+        <ImagePreview
+          title="Edit event image"
+          controlId="eventImage"
+          srcDb={event.eventImage}
+          deleteImage={() => setDeleteOldEventImage(true)}
         />
 
-        <Form.Group className="mb-3" controlId="eventImage">
-          <Form.Label>Change event image</Form.Label>
-          <Form.Control type="file" accept="image/jpeg,image/png" />
-        </Form.Group>
-
-        <Image
-          rounded
-          className="edit-image"
-          src={
-            event.backgroundImage
-              ? event.backgroundImage
-              : "/images/bg-event.jpg"
-          }
+        <ImagePreview
+          title="Edit event image background"
+          controlId="backgroundImage"
+          srcDb={event.backgroundImage}
+          deleteImage={() => setDeleteOldBgImage(true)}
         />
-        <Form.Group className="mb-3" controlId="backgroundImage">
-          <Form.Label>Change event image background</Form.Label>
-          <Form.Control type="file" accept="image/jpeg,image/png" />
-        </Form.Group>
 
         <Form.Group className="mb-3" controlId="country">
           <Form.Label>Country</Form.Label>

@@ -13,11 +13,11 @@ const initialAuthState = {
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  
   const [user, setUser] = useLocalStorage("user", initialAuthState);
 
   const login = (authData) => {
     setUser(authData);
+    console.log(user)
   };
 
   const logout = () => {
@@ -25,7 +25,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, isAuthenticated: Boolean(user.email) }}
+    >
       {children}
     </AuthContext.Provider>
   );

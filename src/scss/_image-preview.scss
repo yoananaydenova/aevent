@@ -1,0 +1,23 @@
+.preview {
+  border: 2px solid #b4acac;
+  border-radius: 0.25rem;
+  margin: 5px 0;
+  padding: 20px;
+  .preview-group {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    align-items: center;
+
+    button {
+      height: fit-content;
+    }
+
+    .preview-group-img {
+      width: 8rem;
+      height: 9rem;
+      border-radius: 0.25rem;
+      margin: 17px;
+    }
+  }
+}
