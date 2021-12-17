@@ -4,6 +4,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 
 import * as eventService from "../../services/eventService";
 
+
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
@@ -111,8 +112,12 @@ const Details = () => {
           <Card.Text>START: {dateFormatter(event.startDateTime)}</Card.Text>
           <Card.Text>FINISH: {dateFormatter(event.endDateTime)}</Card.Text>
           <Card.Text>
-            ADDRESS: {event.country}, {event.city}, {event.address}
+            <span>ONLINE ADDRESS:</span>
+            <a href={event.onlineEventUrl} class="link-primary">
+              {event.onlineEventUrl}
+            </a>
           </Card.Text>
+          <Card.Text> ADDRESS: {event.address} </Card.Text>
           <Card.Text>ORGANIZER: {event.eventOrganizer}</Card.Text>
         </Card.Body>
       </Card>

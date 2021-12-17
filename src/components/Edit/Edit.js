@@ -76,7 +76,7 @@ const Edit = () => {
             }
           }
         } else {
-          formData[target.elements[i].id] = target.elements[i].value;
+          formData[target.elements[i].id] = target.elements[i].value.trim();
         }
       }
     }
@@ -87,9 +87,14 @@ const Edit = () => {
       formData.eventOrganizer = user.firstName + " " + user.lastName;
     }
 
-    eventService.editEvent(eventId, formData).then((response) => {
-      history.push("/");
-    });
+    eventService
+      .editEvent(eventId, formData, user.accessToken)
+      .then((response) => {
+        history.push(`/details/${response._id}`);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   return (
@@ -142,22 +147,17 @@ const Edit = () => {
           deleteImage={() => setDeleteOldBgImage(true)}
         />
 
-        <Form.Group className="mb-3" controlId="country">
-          <Form.Label>Country</Form.Label>
+        <Form.Group className="mb-3" controlId="onlineEventUrl">
+          <Form.Label>Online event</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter country"
-            defaultValue={event.country}
+            placeholder="Enter url for the meeting"
+            defaultValue={event.onlineEventUrl}
+            onChange={handleChange}
           />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="city">
-          <Form.Label>City</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter city"
-            defaultValue={event.city}
-          />
+          {errors.onlineEventUrl ? (
+            <Alert variant="danger"> {errors.onlineEventUrl}</Alert>
+          ) : null}
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="address">

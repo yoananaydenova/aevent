@@ -22,7 +22,7 @@ async function responseHandler(res) {
   if (res.ok) {
     return Object.values(jsonData);
   } else {
-    throw jsonData;
+     throw jsonData; 
   }
 }
 

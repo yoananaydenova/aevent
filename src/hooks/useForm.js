@@ -131,6 +131,22 @@ const useForm = (callback) => {
           setErrors(newObj);
         }
         break;
+      case "onlineEventUrl":
+        if (
+          !new RegExp(
+            /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g
+          ).test(value)
+        ) {
+          setErrors({
+            ...errors,
+            onlineEventUrl:
+              "Event online address URL must starts with either HTTP or HTTPS and then followed by :// and then it must contain www. and then followed by a subdomain and domain",
+          });
+        } else {
+          const newObj = (({ onlineEventUrl, ...rest }) => rest)(errors);
+          setErrors(newObj);
+        }
+        break;
       default:
         break;
     }

@@ -24,35 +24,62 @@ const JoinEvent = ({ eventId }) => {
   const history = useHistory();
 
   useEffect(() => {
-    joinService.getJoinedEventById(user._id, eventId).then((response) => {
-      if (response.length > 0) {
-        setJoin(response[0]);
-      }
-    });
+    joinService
+      .getJoinedEventById(user._id, eventId)
+      .then((response) => {
+        if (response.length > 0) {
+          setJoin(response[0]);
+        }
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
   }, [eventId, user._id]);
 
   const joinHandler = (e) => {
     e.preventDefault();
-    //if have id - delete
+    
+
     if (!isAuthenticated) {
       history.push("/login");
     } else {
-      if (join._id) {
-        joinService.deleteJoinEvent(join._id).then((res) => {
-          setJoin(initialJoinItem);
-          addNotification(
-            "Successfuly delete the event from the joined events",
-            types.success
-          );
-        });
-      } else {
-        joinService.addJoinEvent({ eventId }, user.accessToken).then((res) => {
+      joinService
+        .addJoinEvent({ eventId }, user.accessToken)
+        .then((res) => {
           setJoin(res);
+
           addNotification(
             "Successfuly added the event to the joined events",
             types.success
           );
+        })
+        .catch((e) => {
+          console.log(e.message);
         });
+    }
+  };
+
+  const unJoinHandler = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      history.push("/login");
+    } else {
+     
+      if (join._id) {
+        joinService
+          .deleteJoinEvent(join._id)
+          .then((res) => {
+            setJoin(initialJoinItem);
+         
+            addNotification(
+              "Successfuly delete the event from the joined events",
+              types.success
+            );
+          })
+          .catch((e) => {
+           
+            console.log(e.message);
+          });
       }
     }
   };
@@ -66,7 +93,7 @@ const JoinEvent = ({ eventId }) => {
             <Button
               className="event-details-button-miss"
               variant="secondary"
-              onClick={joinHandler}
+              onClick={unJoinHandler}
             >
               I will miss the event
             </Button>

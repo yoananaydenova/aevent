@@ -23,10 +23,10 @@ const Register = () => {
   function onRegisterHandler() {
     authService
       .register({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        password: values.password,
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: values.email.trim(),
+        password: values.password.trim(),
       })
       .then((authData) => {
         login(authData);

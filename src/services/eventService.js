@@ -45,8 +45,25 @@ export const deleteEvent = (eventId, token) => {
   }).then((res) => res.json());
 };
 
-export const editEvent = (eventId, eventData) => {
-  return request.put(`${baseUrl}/events/${eventId}`, eventData);
+export const editEvent = async (eventId, eventData, token) => {
+  // return request.put(`${baseUrl}/events/${eventId}`, eventData);
+  let response = await fetch(`${baseUrl}/events/${eventId}`, {
+    method: "PUT",
+    headers: {
+      "content-type": "application/json",
+      "X-Authorization": token,
+    },
+    body: JSON.stringify(eventData),
+  });
+  
+  let result;
+  if (response.ok) {
+    result = await response.json(); 
+  }else{
+    throw Error(response);
+  }
+  return result;
+
 };
 
 // todo pagination and sorting
@@ -74,7 +91,6 @@ export const getEventsByCategoryAndOwner = async (categoryId, ownerId) => {
     let events = await response.json();
     result = Object.values(events);
   }
-
   return result;
 };
 

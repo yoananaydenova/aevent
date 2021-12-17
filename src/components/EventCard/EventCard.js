@@ -22,7 +22,7 @@ const EventCard = ({ event }) => {
       />
 
       <Card.Body>
-        <Card.Subtitle className="event-card-date">
+        <Card.Subtitle data-testid="event-card-date" className="event-card-date">
           {dateFormatter(event.startDateTime)}
         </Card.Subtitle>
         <Card.Title className="event-card-title">{event.title}</Card.Title>

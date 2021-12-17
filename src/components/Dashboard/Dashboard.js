@@ -1,8 +1,10 @@
 import { useState, useEffect, useContext } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import Button from "react-bootstrap/Button";
-import Nav from "react-bootstrap/Nav";
+import Tabs from "react-bootstrap/Tabs";
+import Tab from "react-bootstrap/Tab";
+
 import EventCard from "../EventCard";
 import * as categoryService from "../../services/categoryService";
 import * as eventService from "../../services/eventService";
@@ -14,17 +16,20 @@ const subtitleDashboard = {
   joined: "joined events",
   favorites: "my favorite events",
 };
+
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [navKey, setNavKey] = useState("my-events");
-  const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState("all");
+  const [categories, setCategories] = useState([]);
+
+  const [activeCategory, setActiveCategory] = useState(0);
 
   const { user } = useContext(AuthContext);
   const history = useHistory();
 
   useEffect(() => {
-    let categories = categoryService
+    const categories = categoryService
       .getCategories()
       .sort((a, b) => b.id - a.id);
 
@@ -38,73 +43,89 @@ const Dashboard = () => {
   const onCategoryClick = (e) => {
     e.preventDefault();
 
-    const categoryName = e.target.innerText;
-    const categoryText = categoryName.toLowerCase().split(" & ").join("-and-");
-    setCategoryName(categoryText);
-    history.push(`/dashboard/${navKey}/${categoryText}`);
+    const categoryInnerText = e.target.innerText;
+    const categoryName = categoryInnerText
+      .toLowerCase()
+      .split(" & ")
+      .join("-and-");
+
+    setCategoryName(categoryName);
 
     let categoryId = e.target.value;
+    setActiveCategory(categoryId);
 
     if (Number(categoryId) === 0) {
-      onAllCategoryClick();
+      onAllCategory();
     } else {
-      switch (navKey) {
-        case "my-events":
-          eventService
-            .getEventsByCategoryAndOwner(categoryId, user._id)
-            .then((result) => {
-              setEvents(result);
-            });
-          break;
-        case "joined":
-          joinService.getJoinedListByUserId(user._id).then((result) => {
-            const resultArr = result.map((x) => x.eventId);
-            const resultJoinedStr = '"'
-              .concat(resultArr.join('", "'))
-              .concat('"');
-            if (resultJoinedStr) {
-              eventService
-                .getAllEventsByIdAndCategory(resultJoinedStr, categoryId)
-                .then((result) => {
-                  setEvents(result);
-                });
-            } else {
-              setEvents([]);
-            }
-          });
+      onCurrentCategory();
+    }
+    history.push(`/dashboard/${navKey}/${categoryName}`);
+  };
 
-          break;
-        case "favorites":
-          favoritesService.getFavoriteListByUserId(user._id).then((result) => {
-            const resultArr = result.map((x) => x.eventId);
-            const resultFavoriteStr = '"'
-              .concat(resultArr.join('", "'))
-              .concat('"');
-            if (resultFavoriteStr) {
-              eventService
-                .getAllEventsByIdAndCategory(resultFavoriteStr, categoryId)
-                .then((result) => {
-                  setEvents(result);
-                });
-            } else {
-              setEvents([]);
-            }
-          });
+  const onNavSelectHandle = (navValue) => {
+    setNavKey(navValue);
 
-          break;
-        default:
-        //todo throw
-      }
+    if (Number(activeCategory) === 0) {
+      onAllCategory();
+    } else {
+      onCurrentCategory();
+    }
+    history.push(`/dashboard/${navKey}/${categoryName}`);
+  };
+
+  const onCurrentCategory = () => {
+    switch (navKey) {
+      case "my-events":
+        eventService
+          .getEventsByCategoryAndOwner(activeCategory, user._id)
+          .then((result) => {
+            setEvents(result);
+          });
+        break;
+      case "joined":
+        joinService.getJoinedListByUserId(user._id).then((result) => {
+          const resultArr = result.map((x) => x.eventId);
+          const resultJoinedStr = '"'
+            .concat(resultArr.join('", "'))
+            .concat('"');
+          if (resultJoinedStr) {
+            eventService
+              .getAllEventsByIdAndCategory(resultJoinedStr, activeCategory)
+              .then((result) => {
+                setEvents(result);
+              });
+          } else {
+            setEvents([]);
+          }
+        });
+
+        break;
+      case "favorites":
+        favoritesService.getFavoriteListByUserId(user._id).then((result) => {
+          const resultArr = result.map((x) => x.eventId);
+          const resultFavoriteStr = '"'
+            .concat(resultArr.join('", "'))
+            .concat('"');
+          if (resultFavoriteStr) {
+            eventService
+              .getAllEventsByIdAndCategory(resultFavoriteStr, activeCategory)
+              .then((result) => {
+                setEvents(result);
+              });
+          } else {
+            setEvents([]);
+          }
+        });
+
+        break;
+      default:
     }
   };
 
-  const onAllCategoryClick = () => {
-    setCategoryName("all");
-
+  const onAllCategory = () => {
     switch (navKey) {
       case "my-events":
         eventService.getAllByOwner(user._id).then((data) => {
-          history.push("/dashboard/my-events/all");
           setEvents(data);
         });
         break;
@@ -117,7 +138,6 @@ const Dashboard = () => {
 
           if (resultJoinedStr) {
             eventService.getAllEventsById(resultJoinedStr).then((result) => {
-              history.push("/dashboard/joined/all");
               setEvents(result);
             });
           } else {
@@ -131,11 +151,16 @@ const Dashboard = () => {
           const resultFavoriteStr = '"'
             .concat(resultArr.join('", "'))
             .concat('"');
+
           if (resultFavoriteStr) {
-            eventService.getAllEventsById(resultFavoriteStr).then((result) => {
-              history.push("/dashboard/favorites/all");
-              setEvents(result);
-            });
+            eventService
+              .getAllEventsById(resultFavoriteStr)
+              .then((result) => {
+                setEvents(result);
+              })
+              .catch((e) => {
+                console.log(e);
+              });
           } else {
             setEvents([]);
           }
@@ -143,12 +168,7 @@ const Dashboard = () => {
 
         break;
       default:
-      //todo throw
     }
-  };
-
-  const onNavSelectHandle = (navKey) => {
-    setNavKey(navKey);
   };
 
   return (
@@ -156,41 +176,18 @@ const Dashboard = () => {
       <section className="dashboard-head">
         <h3 className="dashboard-title">Dashboard</h3>
         <h3>{subtitleDashboard[navKey]}</h3>
-        <Nav
-          fill
-          variant="tabs"
-          defaultActiveKey="my-events"
-          onSelect={onNavSelectHandle}
+        <Tabs
+          id="controlled-tab-example"
+          activeKey={navKey}
+          onSelect={(k) => {
+            onNavSelectHandle(k);
+          }}
+          className="mb-3"
         >
-          <Nav.Item>
-            <Nav.Link
-              as={Link}
-              eventKey="my-events"
-              to={`/dashboard/my-events/${categoryName}`}
-            >
-              My Events
-            </Nav.Link>
-          </Nav.Item>
-
-          <Nav.Item>
-            <Nav.Link
-              as={Link}
-              eventKey="joined"
-              to={`/dashboard/joined/${categoryName}`}
-            >
-              Joined
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link
-              as={Link}
-              eventKey="favorites"
-              to={`/dashboard/favorites/${categoryName}`}
-            >
-              Favorites
-            </Nav.Link>
-          </Nav.Item>
-        </Nav>
+          <Tab eventKey="my-events" title="My Events"></Tab>
+          <Tab eventKey="joined" title="Joined"></Tab>
+          <Tab eventKey="favorites" title="Favorites"></Tab>
+        </Tabs>
       </section>
       <section className="dashboard">
         <section className="dashboard-category-buttons">
@@ -198,16 +195,17 @@ const Dashboard = () => {
             variant="outline-secondary"
             key="0"
             value="0"
-            // onClick={onAllCategoryClick}
+            active={Number(activeCategory) === 0}
             onClick={onCategoryClick}
           >
-            All events
+            All
           </Button>
           {categories.map((category) => (
             <Button
               variant="outline-secondary"
               key={category.id}
               value={category.id}
+              active={Number(activeCategory) === category.id}
               onClick={onCategoryClick}
             >
               {category.name}

@@ -28,7 +28,15 @@ export const getJoinedEventById = async (userId, eventId) => {
 };
 
 export const getJoinedListByUserId = async (userId) => {
-  return request.get(
+  let response = await fetch(
     `${baseUrl}/joined?where=_ownerId%3D%22${userId}%22&select=eventId`
   );
+
+  let result = [];
+
+  if (response.ok) {
+    let events = await response.json();
+    result = Object.values(events);
+  }
+  return result;
 };

@@ -27,13 +27,16 @@ const FavoriteEvent = ({ eventId }) => {
   const history = useHistory();
 
   useEffect(() => {
-    async function getFavorite() {
-      let favorite = await favoritesService.getFavoriteById(user._id, eventId);
-      if (favorite.length > 0) {
-        setFavorite(favorite[0]);
-      }
-    }
-    getFavorite();
+    favoritesService
+      .getFavoriteById(user._id, eventId)
+      .then((response) => {
+        if (response.length > 0) {
+          setFavorite(response[0]);
+        }
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
   }, [eventId, user._id]);
 
   const favoriteHandler = (e) => {
@@ -43,13 +46,18 @@ const FavoriteEvent = ({ eventId }) => {
       history.push("/login");
     } else {
       if (favorite._id) {
-        favoritesService.deleteFavorite(favorite._id).then((res) => {
-          setFavorite(initialFavoriteItem);
-          addNotification(
-            "Successfuly delete the event from the favorite collection",
-            types.success
-          );
-        });
+        favoritesService
+          .deleteFavorite(favorite._id)
+          .then((res) => {
+            setFavorite(initialFavoriteItem);
+            addNotification(
+              "Successfuly delete the event from the favorite collection",
+              types.success
+            );
+          })
+          .catch((e) => {
+            console.log(e.message);
+          });
       } else {
         favoritesService
           .addFavorite({ eventId }, user.accessToken)
@@ -59,6 +67,9 @@ const FavoriteEvent = ({ eventId }) => {
               "Successfuly added the event to the favorite collection",
               types.success
             );
+          })
+          .catch((e) => {
+            console.log(e.message);
           });
       }
     }
