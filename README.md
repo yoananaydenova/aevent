@@ -16,7 +16,7 @@
 - Data validation
 - Tests - EventCard
 - File storage (images) - Cloudinary
-- Deploy the application in a cloud (Firebase) - 
+- Deploy the application in a cloud (Firebase) - https://aevent-335222.firebaseapp.com
 
 
 
