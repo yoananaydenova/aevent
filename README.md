@@ -1,3 +1,25 @@
+# Brief documentation on the project
+## Dynamic pages: Home, Catalog, Details, Dashboard, Create, Edit.
+## Collections: 
+- users (create, read)
+- events (create, read, update, delete)
+- favorites (create, read, delete)
+- joined (create, read, delete)
+## Users:
+- Logged in users - can create events, edit and delete own events, join on all events, add to favorite collection if the event is created by someone else.
+- Guest – have access to all pages except Dashboard, Create, Edit. He can't create, edit and delete event, make favorite or join to event.
+## Back-end:
+- softuni-practice-server: http://softuni-custom-server.herokuapp.com
+## Other requirements:
+- Appearance: SASS
+- Error handling
+- Data validation
+- Tests - EventCard
+- File storage (images) - Cloudinary
+- Deploy the application in a cloud (Firebase) - 
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
