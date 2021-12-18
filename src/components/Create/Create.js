@@ -202,6 +202,9 @@ const Create = () => {
             as organizer.
           </Form.Text>
         </Form.Group>
+        {errors.formError ? (
+            <Alert variant="danger"> {errors.formError}</Alert>
+          ) : null}
         <Button className="create-form-btn" variant="primary" type="submit">
           Submit
         </Button>

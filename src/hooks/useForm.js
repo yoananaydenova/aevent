@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import { omit } from "loadash";
 
 const useForm = (callback) => {
   //Form values
@@ -162,7 +161,6 @@ const useForm = (callback) => {
 
     validate(event, name, val);
 
-    //Let's set these values in state
     setValues({
       ...values,
       [name]: val,
@@ -176,6 +174,7 @@ const useForm = (callback) => {
       callback(event);
     } else {
       console.log("There is an Error in the form!");
+      
     }
   };
 

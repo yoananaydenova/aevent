@@ -40,6 +40,15 @@ const Dashboard = () => {
     });
   }, [user._id]);
 
+  useEffect(() => {
+    if (Number(activeCategory) === 0) {
+      onAllCategory();
+    } else {
+      onCurrentCategory();
+    }
+    history.push(`/dashboard/${navKey}/${categoryName}`);
+  }, [categoryName, navKey]);
+
   const onCategoryClick = (e) => {
     e.preventDefault();
 
@@ -53,24 +62,10 @@ const Dashboard = () => {
 
     let categoryId = e.target.value;
     setActiveCategory(categoryId);
-
-    if (Number(categoryId) === 0) {
-      onAllCategory();
-    } else {
-      onCurrentCategory();
-    }
-    history.push(`/dashboard/${navKey}/${categoryName}`);
   };
 
   const onNavSelectHandle = (navValue) => {
     setNavKey(navValue);
-
-    if (Number(activeCategory) === 0) {
-      onAllCategory();
-    } else {
-      onCurrentCategory();
-    }
-    history.push(`/dashboard/${navKey}/${categoryName}`);
   };
 
   const onCurrentCategory = () => {
@@ -106,6 +101,7 @@ const Dashboard = () => {
           const resultFavoriteStr = '"'
             .concat(resultArr.join('", "'))
             .concat('"');
+
           if (resultFavoriteStr) {
             eventService
               .getAllEventsByIdAndCategory(resultFavoriteStr, activeCategory)
