@@ -1,5 +1,5 @@
 # Brief documentation on the project
-## Dynamic pages: Home, Catalog, Details, Dashboard, Create, Edit.
+## Dynamic pages: Home, Catalog, Details, Dashboard.
 ## Collections: 
 - users (create, read)
 - events (create, read, update, delete)
